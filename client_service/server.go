@@ -23,17 +23,10 @@ func StartHTTPServer(log *logrus.Entry, port int) error {
 		log.Panic("Please set PORTS_JSON env variable to path to ports json file")
 	}
 
-	portsServiceAddress := os.Getenv("PORTS_ADDRESS")
-	if portsServiceAddress == "" {
-		log.Panic("Please specify address of ports service in PORTS_ADDRESS environment variable")
-	}
-
-	portsConn, err := newPortsService(portsServiceAddress)
+	portsSrv, portsConn, err := newPortsService()
 	if err != nil {
-		log.Panicf("Can't connect to Ports service using address %s: %s", portsServiceAddress, err)
+		panic(err)
 	}
-
-	portsSrv := ports.NewPortsServiceClient(portsConn)
 
 	err = loadJSON(log, filename, portsSrv)
 	if err != nil {
@@ -43,7 +36,7 @@ func StartHTTPServer(log *logrus.Entry, port int) error {
 	router := http.NewServeMux()
 
 	srv := http.Server{
-		Addr:    fmt.Sprintf("localhost:%d", port),
+		Addr:    fmt.Sprintf(":%d", port),
 		Handler: router,
 		// timeouts for bad http clients
 		ReadTimeout:       5 * time.Second,
