@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+option go_package = ".;ports";
+
+// Ports service description
+service PortsService {
+  // Sends a greeting
+  rpc Upsert (PortProto) returns (UpsertResponse);
+  rpc List (ListRequest) returns (stream PortProto);
+  rpc FindByKey (FindRequest) returns (FindResponse);
+}
+
+// Description of a PortProto structure.
+message PortProto {      
+  string key = 1;
+  string name = 2;
+  string city = 3;
+  string country = 4;
+  repeated string alias = 5;
+  repeated string regions = 6;
+  repeated double coordinates = 7;
+  string province = 8;
+  string timezone = 9;
+  repeated string unlocks = 10;
+  string code = 11;
+}
+
+message FindRequest {
+  string key = 1;
+}
+
+message FindResponse {
+  PortProto port = 1;
+  bool found = 2;
+}
+
+message ListRequest {}
+
+
+message UpsertResponse {}

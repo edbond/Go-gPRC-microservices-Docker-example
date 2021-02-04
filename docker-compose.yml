@@ -1,0 +1,17 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  ports_service:
+    build: 
+      context: .
+      dockerfile: ports_service/Dockerfile
+    ports:
+      - "4040:4040"
+
+  client_service:
+    build: 
+      context: .
+      dockerfile: client_service/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+        - ports_service

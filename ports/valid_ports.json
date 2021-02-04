@@ -1,0 +1,23 @@
+{
+    "AEAJM": {
+        "name": "Ajman",
+        "city": "Ajman",
+        "country": "United Arab Emirates",
+        "alias": [
+            "Ajman alias"
+        ],
+        "regions": [
+            "Ajman region"
+        ],
+        "coordinates": [
+            55.5136433,
+            25.4052165
+        ],
+        "province": "Ajman",
+        "timezone": "Asia/Dubai",
+        "unlocs": [
+            "AEAJM"
+        ],
+        "code": "52000"
+    }
+}
