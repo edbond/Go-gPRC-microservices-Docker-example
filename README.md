@@ -53,7 +53,7 @@ Client service starts after Ports service.
 
 Run `docker-compose up --build` to start both services.
 
-Exepected output:
+Docker output:
 
 ```sh
 Starting ports_ports_service_1 ... done
