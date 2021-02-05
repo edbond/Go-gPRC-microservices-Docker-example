@@ -14,11 +14,19 @@ The repository is an interface that includes several functions to upsert (insert
 list all ports.
 There is an in-memory implementation of the repository that stores all data in a map.
 
+Ports service expects following environment variables set:
+- `PORTS_GRPC_PORT` port number gRPC server will be listen to
+
 ## Client service
 
 Client service on startup reads ports from JSON file and calls upsert on ports service to
 store ports.
 Client service provides HTTP API to get a list of all ports.
+
+Client service needs following environment variables:
+- `HTTP_PORT` HTTP port REST service will use
+- `PORTS_ADDRESS` Address of Ports gRPC server
+- `PORTS_JSON` Path to ports.json file
 
 ## Folders structure
 
@@ -37,14 +45,17 @@ Script `gen.sh` generates protobuf structures, functions, and gRPC client and se
 
 To run tests run the script `test.sh`. The script will run tests in all 3 folders.
 
-## Running
+## Running in docker
 
 Client and Ports services contain dockerfiles to build and run them in containers.
-`docker-compose.yml` file contains instructions on how to launch services in docker.
+Client service starts after Ports service.
+`docker-compose.yml` file describes services in docker.
 
 Run `docker-compose up --build` to start both services.
 
-```
+Exepected output:
+
+```sh
 Starting ports_ports_service_1 ... done
 Starting ports_client_service_1 ... done
 Attaching to ports_ports_service_1, ports_client_service_1
@@ -52,6 +63,9 @@ ports_service_1   | time="2021-02-04T20:17:35Z" level=info msg="Starting Ports G
 client_service_1  | time="2021-02-04T20:17:37Z" level=info msg="Total ports loaded: 1632, failed: 0" Server=Client
 client_service_1  | time="2021-02-04T20:17:37Z" level=info msg="🆙 Starting server at port 8080" Server=Client
 ```
+
+Open second terminal and run
+`curl :8080/ports` to get a list of all ports in JSON format
 
 Press `Ctrl+C` to stop services gracefully.
 

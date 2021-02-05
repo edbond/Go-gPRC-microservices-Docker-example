@@ -9,7 +9,9 @@ import (
 	"ports.services.com/ports"
 )
 
-func newPortsService() (ports.PortsServiceClient, *grpc.ClientConn, error) {
+// NewPortsService connects to Ports gRPC server
+// and returns service, connection and error
+func NewPortsService() (ports.PortsServiceClient, *grpc.ClientConn, error) {
 	portsServiceAddress := os.Getenv("PORTS_ADDRESS")
 	if portsServiceAddress == "" {
 		return nil, nil, errors.New("Please specify address of ports service in PORTS_ADDRESS environment variable")

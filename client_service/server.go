@@ -11,21 +11,17 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
 	"ports.services.com/ports"
 )
 
 // StartHTTPServer loads json and starts HTTP server
-func StartHTTPServer(log *logrus.Entry, port int) error {
+func StartHTTPServer(log *logrus.Entry, port int, portsSrv ports.PortsServiceClient, portsConn *grpc.ClientConn) error {
 	var err error
 
 	filename := os.Getenv("PORTS_JSON")
 	if filename == "" {
 		log.Panic("Please set PORTS_JSON env variable to path to ports json file")
-	}
-
-	portsSrv, portsConn, err := newPortsService()
-	if err != nil {
-		panic(err)
 	}
 
 	err = loadJSON(log, filename, portsSrv)
@@ -46,7 +42,7 @@ func StartHTTPServer(log *logrus.Entry, port int) error {
 
 	// HTTP Hanlder
 	// GET / returns all ports from ports service
-	router.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/ports", func(rw http.ResponseWriter, r *http.Request) {
 		getPorts(portsSrv, rw, r)
 	})
 
