@@ -44,7 +44,7 @@ func StartHTTPServer(log *logrus.Entry, port int, portsSrv ports.PortsServiceCli
 	// HTTP Hanlder
 	// GET / returns all ports from ports service
 	router.HandleFunc("/ports", func(rw http.ResponseWriter, r *http.Request) {
-		getPorts(portsSrv, rw, r)
+		getPorts(log, portsSrv, rw, r)
 	})
 
 	// Listen for signals
@@ -104,12 +104,12 @@ func loadJSON(log *logrus.Entry, filename string, portsSrv ports.PortsServiceCli
 	return nil
 }
 
-func getPorts(portsSrv ports.PortsServiceClient, w http.ResponseWriter, req *http.Request) {
+func getPorts(log *logrus.Entry, portsSrv ports.PortsServiceClient, w http.ResponseWriter, req *http.Request) {
 
 	ctx := context.Background()
 	allPortsClient, err := portsSrv.List(ctx, &ports.ListRequest{})
 	if err != nil {
-		httpError(err, "error from Ports service", w)
+		httpError(log, err, "error from Ports service", w)
 		return
 	}
 
@@ -121,7 +121,7 @@ func getPorts(portsSrv ports.PortsServiceClient, w http.ResponseWriter, req *htt
 		}
 
 		if err != nil {
-			httpError(err, "error reading Port from service", w)
+			httpError(log, err, "error reading Port from service", w)
 			return
 		}
 
@@ -130,16 +130,20 @@ func getPorts(portsSrv ports.PortsServiceClient, w http.ResponseWriter, req *htt
 
 	portsJSON, err := json.Marshal(allPorts)
 	if err != nil {
-		httpError(err, "error serializing JSON", w)
+		httpError(log, err, "error serializing JSON", w)
 		return
 	}
 	w.WriteHeader(http.StatusOK)
-	w.Write(portsJSON)
+	if _, err := w.Write(portsJSON); err != nil {
+		log.Warnf("error writing output json: %s", err.Error())
+	}
 }
 
-func httpError(err error, msg string, w http.ResponseWriter) {
+func httpError(log *logrus.Entry, err error, msg string, w http.ResponseWriter) {
 	errMessage := fmt.Sprintf("%s: %s", msg, err)
 
 	w.WriteHeader(http.StatusBadGateway)
-	w.Write([]byte(errMessage))
+	if _, err := w.Write([]byte(errMessage)); err != nil {
+		log.Warnf("error writing output json: %s", err.Error())
+	}
 }
