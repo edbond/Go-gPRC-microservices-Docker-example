@@ -16,6 +16,10 @@ Client service exposes the HTTP interface to add and list ports.
 - Go modules
 - Github Actions to run tests and lint on push
 
+![Lint](https://github.com/edbond/Go-gPRC-microservices-Docker-example/workflows/golangci-lint/badge.svg)
+
+![Tests](https://github.com/edbond/Go-gPRC-microservices-Docker-example/workflows/tests/badge.svg)
+
 ## Ports service
 
 Ports service is used to store ports.
