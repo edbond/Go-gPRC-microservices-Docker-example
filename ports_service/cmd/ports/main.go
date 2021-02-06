@@ -11,5 +11,8 @@ func main() {
 	log := logger.WithFields(logrus.Fields{
 		"Server": "Ports GRPC Server",
 	})
-	service.StartGRPCServer(log)
+
+	if err := service.StartGRPCServer(log); err != nil {
+		log.Panic(err)
+	}
 }

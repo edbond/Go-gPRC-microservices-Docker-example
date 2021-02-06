@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"portsservice/internal"
 	"portsservice/repository"
+	"syscall"
 
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -26,7 +27,10 @@ func (srv *portsService) List(req *ports.ListRequest, listResponse ports.PortsSe
 	}
 
 	for _, p := range allPorts {
-		listResponse.Send(ports.PortToProto(&p))
+		err = listResponse.Send(ports.PortToProto(&p))
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }
@@ -39,12 +43,15 @@ func (srv *portsService) Upsert(ctx context.Context, port *ports.PortProto) (*po
 }
 
 // StartGRPCServer starts Ports GRPC server
-func StartGRPCServer(log *logrus.Entry) {
+func StartGRPCServer(log *logrus.Entry) error {
 	grpcServer := grpc.NewServer()
 
 	grpcService := portsService{}
 	repository := internal.MemoryRepository{}
-	repository.Init()
+	err := repository.Init()
+	if err != nil {
+		return fmt.Errorf("repository initialization error: %w", err)
+	}
 	grpcService.repository = &repository
 
 	ports.RegisterPortsServiceServer(grpcServer, &grpcService)
@@ -63,7 +70,7 @@ func StartGRPCServer(log *logrus.Entry) {
 
 	// Listen for signals
 	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt, os.Kill)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	shutdownComplete := make(chan struct{}, 1)
 	go func() {
 		<-c
@@ -81,4 +88,6 @@ func StartGRPCServer(log *logrus.Entry) {
 		log.Panic(err)
 	}
 	<-shutdownComplete
+
+	return nil
 }
