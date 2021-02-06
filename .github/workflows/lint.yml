@@ -19,7 +19,7 @@ jobs:
 
       - name: Allow unsecure commands
         run: |
-            echo "ACTIONS_ALLOW_UNSECURE_COMMANDS=yes" >> $GITHUB_ENV
+            echo "ACTIONS_ALLOW_UNSECURE_COMMANDS=true" >> $GITHUB_ENV
 
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v1.2.1
