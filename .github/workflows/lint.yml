@@ -10,12 +10,16 @@ jobs:
     # Name the Job
     name: Lint code
     # Set the type of machine to run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
 
     steps:
       # Checks out a copy of your repository on the ubuntu-latest machine
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Allow unsecure commands
+        run: |
+            echo "ACTIONS_ALLOW_UNSECURE_COMMANDS=yes" >> $GITHUB_ENV
 
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v1.2.1
