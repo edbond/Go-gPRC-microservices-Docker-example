@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -48,7 +49,7 @@ func StartHTTPServer(log *logrus.Entry, port int, portsSrv ports.PortsServiceCli
 
 	// Listen for signals
 	c := make(chan os.Signal, 1)
-	signal.Notify(c, os.Interrupt, os.Kill)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
 		log.Infoln("🔻 Shutdown server")

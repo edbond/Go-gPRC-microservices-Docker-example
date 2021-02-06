@@ -5,6 +5,17 @@ The purpose of the system is to store, update and return marine port objects.
 There are 2 microservices (Client and Ports) that communicate using gRPC.
 Client service exposes the HTTP interface to add and list ports.
 
+## Features
+
+- gRPC Client and Service communation
+- Storage using repository pattern
+- Tests
+- Lint using golangci
+- Docker and docker-compose
+- Read JSON lazy, allowing to consume JSON of huge size, larger than memory
+- Go modules
+- Github Actions to run tests and lint on push
+
 ## Ports service
 
 Ports service is used to store ports.

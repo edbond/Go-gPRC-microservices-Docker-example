@@ -39,6 +39,10 @@ func TestUpsert(t *testing.T) {
 
 	// Verify we have 1 port in repository now
 	allPorts, err := repo.AllPorts()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	if len(allPorts) != 1 {
 		t.Fatalf("repository should contains 1 port, has %d instead", len(allPorts))
 	}
@@ -53,6 +57,10 @@ func TestUpsert(t *testing.T) {
 
 	// Should have still 1 port in repository
 	allPorts, err = repo.AllPorts()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	if len(allPorts) != 1 {
 		t.Fatalf("repository should contains 1 port after upsert, has %d instead", len(allPorts))
 	}
@@ -70,6 +78,10 @@ func TestUpsert(t *testing.T) {
 
 	// Should have 2 port in repository now
 	allPorts, err = repo.AllPorts()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	if len(allPorts) != 2 {
 		t.Fatalf("repository should contains 2 port after upsert, has %d instead", len(allPorts))
 	}
