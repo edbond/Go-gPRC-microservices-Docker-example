@@ -41,7 +41,7 @@ func StartHTTPServer(log *logrus.Entry, port int, portsSrv ports.PortsServiceCli
 		WriteTimeout:      5 * time.Second,
 	}
 
-	// HTTP Hanlder
+	// HTTP Handler
 	// GET / returns all ports from ports service
 	router.HandleFunc("/ports", func(rw http.ResponseWriter, r *http.Request) {
 		getPorts(log, portsSrv, rw, r)

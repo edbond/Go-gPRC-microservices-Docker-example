@@ -1,4 +1,4 @@
-package internal
+package storage
 
 // Implementation of Storage interface by in-memory map
 

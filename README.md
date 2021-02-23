@@ -1,4 +1,4 @@
-# Ports
+# ⚓️ Ports - example of Microservices architecture, gRPC/protobuf, HTTP
 
 The project contains an example of microservices written in Go.
 The purpose of the system is to store, update and return marine port objects.
@@ -7,16 +7,18 @@ Client service exposes the HTTP interface to add and list ports.
 
 ## Features
 
-- gRPC Client and Service communation
-- Storage using repository pattern
-- Tests
-- Lint using golangci
-- Docker and docker-compose
-- Read JSON lazy, allowing to consume JSON of huge size, larger than memory
-- Go modules
-- Github Actions to run tests and lint on push
+- 🤝 gRPC Client and Service communation
+- :cd: Storage using repository pattern
+- 🟢 Tests
+- ✅ Lint using golangci
+- 🚢 Docker and docker-compose
+- :fire: Read JSON lazy, allowing to consume JSON of huge size, larger than memory
+- 🔧 Go modules
+- 🎉 Github Actions to run tests and lint on push
 
 ![Lint](https://github.com/edbond/Go-gPRC-microservices-Docker-example/workflows/golangci-lint/badge.svg)
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/edbond/Go-gPRC-microservices-Docker-example)](https://goreportcard.com/report/github.com/edbond/Go-gPRC-microservices-Docker-example)
 
 ![Tests](https://github.com/edbond/Go-gPRC-microservices-Docker-example/workflows/tests/badge.svg)
 

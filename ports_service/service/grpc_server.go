@@ -6,8 +6,8 @@ import (
 	"net"
 	"os"
 	"os/signal"
-	"portsservice/internal"
 	"portsservice/repository"
+	"portsservice/storage"
 	"syscall"
 
 	"github.com/sirupsen/logrus"
@@ -47,7 +47,7 @@ func StartGRPCServer(log *logrus.Entry) error {
 	grpcServer := grpc.NewServer()
 
 	grpcService := portsService{}
-	repository := internal.MemoryRepository{}
+	repository := storage.MemoryRepository{}
 	err := repository.Init()
 	if err != nil {
 		return fmt.Errorf("repository initialization error: %w", err)
