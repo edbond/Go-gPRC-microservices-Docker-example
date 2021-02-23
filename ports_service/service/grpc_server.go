@@ -27,7 +27,7 @@ func (srv *portsService) List(req *ports.ListRequest, listResponse ports.PortsSe
 	}
 
 	for _, p := range allPorts {
-		err = listResponse.Send(ports.PortToProto(&p))
+		err = listResponse.Send(&p)
 		if err != nil {
 			return err
 		}
@@ -35,10 +35,8 @@ func (srv *portsService) List(req *ports.ListRequest, listResponse ports.PortsSe
 	return nil
 }
 
-func (srv *portsService) Upsert(ctx context.Context, port *ports.PortProto) (*ports.UpsertResponse, error) {
-	portStruct := ports.ProtoToPort(port)
-
-	err := srv.repository.Upsert(*portStruct)
+func (srv *portsService) Upsert(ctx context.Context, port *ports.Port) (*ports.UpsertResponse, error) {
+	err := srv.repository.Upsert(*port)
 	return &ports.UpsertResponse{}, err
 }
 

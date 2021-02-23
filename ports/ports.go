@@ -10,21 +10,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Port is a domain model of port
-type Port struct {
-	Key         string    `json:"key,omitempty"`
-	Name        string    `json:"name,omitempty"`
-	City        string    `json:"city,omitempty"`
-	Country     string    `json:"country,omitempty"`
-	Alias       []string  `json:"alias,omitempty"`
-	Regions     []string  `json:"regions,omitempty"`
-	Coordinates []float64 `json:"coordinates,omitempty"`
-	Province    string    `json:"province,omitempty"`
-	Timezone    string    `json:"timezone,omitempty"`
-	Unlocks     []string  `json:"unlocks,omitempty"`
-	Code        string    `json:"code,omitempty"`
-}
-
 var (
 	// ErrPortParse error means that a port record in json file is invalid
 	ErrPortParse = errors.New("error parsing port json")
@@ -87,38 +72,4 @@ func LoadFromJSON(log *logrus.Entry, filename string, onPort PortCallback) error
 	}
 
 	return nil
-}
-
-// PortToProto converts Port struct to PortProto
-func PortToProto(port *Port) *PortProto {
-	return &PortProto{
-		Key:         port.Key,
-		Name:        port.Name,
-		City:        port.City,
-		Country:     port.Country,
-		Alias:       port.Alias,
-		Regions:     port.Regions,
-		Coordinates: port.Coordinates,
-		Province:    port.Province,
-		Timezone:    port.Timezone,
-		Unlocks:     port.Unlocks,
-		Code:        port.Code,
-	}
-}
-
-// ProtoToPort converts Port from protobuf to struct
-func ProtoToPort(port *PortProto) *Port {
-	return &Port{
-		Key:         port.Key,
-		Name:        port.Name,
-		City:        port.City,
-		Country:     port.Country,
-		Alias:       port.Alias,
-		Regions:     port.Regions,
-		Coordinates: port.Coordinates,
-		Province:    port.Province,
-		Timezone:    port.Timezone,
-		Unlocks:     port.Unlocks,
-		Code:        port.Code,
-	}
 }

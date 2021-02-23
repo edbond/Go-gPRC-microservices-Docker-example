@@ -39,6 +39,10 @@ func TestLoadJSON(t *testing.T) {
 		},
 	}
 
+	portsComparer := cmp.Comparer(func(p1, p2 Port) bool {
+		return p1.Key == p2.Key
+	})
+
 	for _, tC := range testCases {
 		t.Run(tC.filename, func(t *testing.T) {
 			var err error
@@ -60,7 +64,7 @@ func TestLoadJSON(t *testing.T) {
 				}
 			}
 
-			if !cmp.Equal(ports, tC.expected) {
+			if !cmp.Equal(ports, tC.expected, portsComparer) {
 				t.Fatalf(`Ports parsed and expected are different:  
 				%v`, cmp.Diff(ports, tC.expected))
 			}

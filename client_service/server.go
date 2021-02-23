@@ -86,7 +86,8 @@ func loadJSON(log *logrus.Entry, filename string, portsSrv ports.PortsServiceCli
 	callback := func(port *ports.Port) {
 		// log.Infof("Port: %v\n", port)
 
-		_, err = portsSrv.Upsert(ctx, ports.PortToProto(port))
+		// _, err = portsSrv.Upsert(ctx, ports.PortToProto(port))
+		_, err = portsSrv.Upsert(ctx, port)
 		if err != nil {
 			log.Errorf("error sending Port to Ports service: %s", err)
 			failedPorts++
@@ -125,7 +126,8 @@ func getPorts(log *logrus.Entry, portsSrv ports.PortsServiceClient, w http.Respo
 			return
 		}
 
-		allPorts = append(allPorts, *ports.ProtoToPort(port))
+		// allPorts = append(allPorts, *ports.ProtoToPort(port))
+		allPorts = append(allPorts, *port)
 	}
 
 	portsJSON, err := json.Marshal(allPorts)
