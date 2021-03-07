@@ -47,9 +47,8 @@ Client service needs following environment variables:
 
 ## Folders structure
 
-There are 3 folders:
+There are 2 folders:
 
-- `ports` contains definitions of a Port structure, ports JSON file.
 - `ports_service` contains the implementation of Ports Service, repository and gRPC server.
 - `client_service` contains the implementation of Client Service.
 
