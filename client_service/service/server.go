@@ -1,6 +1,7 @@
-package clientservice
+package service
 
 import (
+	"clientservice/ports"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -13,7 +14,6 @@ import (
 
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
-	"ports.services.com/ports"
 )
 
 // StartHTTPServer loads json and starts HTTP server
@@ -86,8 +86,7 @@ func loadJSON(log *logrus.Entry, filename string, portsSrv ports.PortsServiceCli
 	callback := func(port *ports.Port) {
 		// log.Infof("Port: %v\n", port)
 
-		// _, err = portsSrv.Upsert(ctx, ports.PortToProto(port))
-		_, err = portsSrv.Upsert(ctx, port)
+		_, err = portsSrv.Upsert(ctx, port.ToTransport())
 		if err != nil {
 			log.Errorf("error sending Port to Ports service: %s", err)
 			failedPorts++
@@ -105,7 +104,7 @@ func loadJSON(log *logrus.Entry, filename string, portsSrv ports.PortsServiceCli
 	return nil
 }
 
-func getPorts(log *logrus.Entry, portsSrv ports.PortsServiceClient, w http.ResponseWriter, req *http.Request) {
+func getPorts(log *logrus.Entry, portsSrv ports.PortsServiceClient, w http.ResponseWriter, _ *http.Request) {
 
 	ctx := context.Background()
 	allPortsClient, err := portsSrv.List(ctx, &ports.ListRequest{})
@@ -114,7 +113,7 @@ func getPorts(log *logrus.Entry, portsSrv ports.PortsServiceClient, w http.Respo
 		return
 	}
 
-	allPorts := []ports.Port{}
+	var allPorts []ports.Port
 	for {
 		port, err := allPortsClient.Recv()
 		if err == io.EOF {
@@ -126,8 +125,10 @@ func getPorts(log *logrus.Entry, portsSrv ports.PortsServiceClient, w http.Respo
 			return
 		}
 
-		// allPorts = append(allPorts, *ports.ProtoToPort(port))
-		allPorts = append(allPorts, *port)
+		allPorts = append(
+			allPorts,
+			*port.ToValue(),
+		)
 	}
 
 	portsJSON, err := json.Marshal(allPorts)

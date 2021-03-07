@@ -1,18 +1,18 @@
 package service
 
 import (
-	context "context"
+	"context"
 	"fmt"
 	"net"
 	"os"
 	"os/signal"
+	"portsservice/ports"
 	"portsservice/repository"
 	"portsservice/storage"
 	"syscall"
 
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
-	ports "ports.services.com/ports"
 )
 
 type portsService struct {
@@ -20,14 +20,15 @@ type portsService struct {
 	repository repository.PortsRepository
 }
 
-func (srv *portsService) List(req *ports.ListRequest, listResponse ports.PortsService_ListServer) error {
+func (srv *portsService) List(_ *ports.ListRequest, listResponse ports.PortsService_ListServer) error {
 	allPorts, err := srv.repository.AllPorts()
 	if err != nil {
 		return err
 	}
 
-	for _, p := range allPorts {
-		err = listResponse.Send(&p)
+	for i := range allPorts {
+		t := allPorts[i].ToTransport()
+		err = listResponse.Send(t)
 		if err != nil {
 			return err
 		}
@@ -35,8 +36,8 @@ func (srv *portsService) List(req *ports.ListRequest, listResponse ports.PortsSe
 	return nil
 }
 
-func (srv *portsService) Upsert(ctx context.Context, port *ports.Port) (*ports.UpsertResponse, error) {
-	err := srv.repository.Upsert(*port)
+func (srv *portsService) Upsert(_ context.Context, port *ports.PortTransport) (*ports.UpsertResponse, error) {
+	err := srv.repository.Upsert(port.ToValue())
 	return &ports.UpsertResponse{}, err
 }
 
@@ -45,18 +46,18 @@ func StartGRPCServer(log *logrus.Entry) error {
 	grpcServer := grpc.NewServer()
 
 	grpcService := portsService{}
-	repository := storage.MemoryRepository{}
-	err := repository.Init()
+	memoryRepository := storage.MemoryRepository{}
+	err := memoryRepository.Init()
 	if err != nil {
-		return fmt.Errorf("repository initialization error: %w", err)
+		return fmt.Errorf("memoryRepository initialization error: %w", err)
 	}
-	grpcService.repository = &repository
+	grpcService.repository = &memoryRepository
 
 	ports.RegisterPortsServiceServer(grpcServer, &grpcService)
 
 	grpcPort := os.Getenv("PORTS_GRPC_PORT")
 	if grpcPort == "" {
-		log.Panic("Please specify tcp port for grpc server in PORTS_GRPC_PORT envrironment variable")
+		log.Panic("Please specify tcp port for grpc server in PORTS_GRPC_PORT environment variable")
 	}
 
 	con, err := net.Listen("tcp", fmt.Sprintf(":%s", grpcPort))
@@ -75,7 +76,10 @@ func StartGRPCServer(log *logrus.Entry) error {
 
 		// Shutdown GRPC server!
 		log.Infoln("🔻 Shutdown server")
-		grpcService.repository.Close()
+		err := grpcService.repository.Close()
+		if err != nil {
+			log.Errorf("error closing repository %s", err)
+		}
 		grpcServer.GracefulStop()
 		log.Infoln("Stopped successfully")
 		shutdownComplete <- struct{}{}

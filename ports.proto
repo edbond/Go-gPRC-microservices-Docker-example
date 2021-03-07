@@ -5,13 +5,13 @@ option go_package = ".;ports";
 // Ports service description
 service PortsService {
   // Sends a greeting
-  rpc Upsert (Port) returns (UpsertResponse);
-  rpc List (ListRequest) returns (stream Port);
+  rpc Upsert (PortTransport) returns (UpsertResponse);
+  rpc List (ListRequest) returns (stream PortTransport);
   rpc FindByKey (FindRequest) returns (FindResponse);
 }
 
 // Description of a Port structure.
-message Port {      
+message PortTransport {
   string key = 1;
   string name = 2;
   string city = 3;
@@ -30,7 +30,7 @@ message FindRequest {
 }
 
 message FindResponse {
-  Port port = 1;
+  PortTransport port = 1;
   bool found = 2;
 }
 

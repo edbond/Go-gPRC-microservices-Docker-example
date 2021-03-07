@@ -1,12 +1,13 @@
-package clientservice
+package service
 
 import (
 	"errors"
 	"fmt"
 	"os"
 
+	"clientservice/ports"
+
 	"google.golang.org/grpc"
-	"ports.services.com/ports"
 )
 
 // NewPortsService connects to Ports gRPC server
@@ -14,7 +15,7 @@ import (
 func NewPortsService() (ports.PortsServiceClient, *grpc.ClientConn, error) {
 	portsServiceAddress := os.Getenv("PORTS_ADDRESS")
 	if portsServiceAddress == "" {
-		return nil, nil, errors.New("Please specify address of ports service in PORTS_ADDRESS environment variable")
+		return nil, nil, errors.New("please specify address of ports service in PORTS_ADDRESS environment variable")
 	}
 
 	portsConn, err := grpc.Dial(portsServiceAddress, grpc.WithInsecure())

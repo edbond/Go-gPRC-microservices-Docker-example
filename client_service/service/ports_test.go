@@ -1,8 +1,10 @@
-package ports
+package service
 
 import (
 	"strings"
 	"testing"
+
+	"clientservice/ports"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/sirupsen/logrus"
@@ -11,12 +13,12 @@ import (
 func TestLoadJSON(t *testing.T) {
 	testCases := []struct {
 		filename      string
-		expected      []Port
+		expected      []ports.Port
 		expectedError error
 	}{
 		{
 			filename: "valid_ports.json",
-			expected: []Port{
+			expected: []ports.Port{
 				{
 					Key:         "AEAJM",
 					Name:        "Ajman",
@@ -34,13 +36,13 @@ func TestLoadJSON(t *testing.T) {
 		},
 		{
 			filename:      "invalid.json",
-			expected:      []Port{},
-			expectedError: ErrPortParse,
+			expected:      []ports.Port{},
+			expectedError: ports.ErrPortParse,
 		},
 	}
 
-	portsComparer := cmp.Comparer(func(p1, p2 Port) bool {
-		return p1.Key == p2.Key
+	portsComparer := cmp.Comparer(func(p1, p2 *ports.Port) bool {
+		return (*p1).Key == (*p2).Key
 	})
 
 	for _, tC := range testCases {
@@ -51,11 +53,11 @@ func TestLoadJSON(t *testing.T) {
 				"Test": tC.filename,
 			})
 
-			ports := []Port{}
-			callback := func(port *Port) {
-				ports = append(ports, *port)
+			portsSlice := []ports.Port{}
+			callback := func(port *ports.Port) {
+				portsSlice = append(portsSlice, *port)
 			}
-			err = LoadFromJSON(log, tC.filename, callback)
+			err = ports.LoadFromJSON(log, tC.filename, callback)
 			if err != nil {
 				if tC.expectedError != nil && strings.Contains(err.Error(), tC.expectedError.Error()) {
 					// OK, we expect this error
@@ -64,9 +66,9 @@ func TestLoadJSON(t *testing.T) {
 				}
 			}
 
-			if !cmp.Equal(ports, tC.expected, portsComparer) {
+			if !cmp.Equal(portsSlice, tC.expected, portsComparer) {
 				t.Fatalf(`Ports parsed and expected are different:  
-				%v`, cmp.Diff(ports, tC.expected))
+				%v`, cmp.Diff(portsSlice, tC.expected))
 			}
 		})
 	}

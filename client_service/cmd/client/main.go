@@ -1,10 +1,9 @@
 package main
 
 import (
+	"clientservice/service"
 	"os"
 	"strconv"
-
-	"clientservice"
 
 	"github.com/sirupsen/logrus"
 )
@@ -27,12 +26,12 @@ func main() {
 	}
 
 	// Connect to Ports gRPC server
-	portsSrv, portsConn, err := clientservice.NewPortsService()
+	portsSrv, portsConn, err := service.NewPortsService()
 	if err != nil {
 		log.Panicln("error connecting to Ports gRPC server", err)
 	}
 
-	err = clientservice.StartHTTPServer(log, int(port), portsSrv, portsConn)
+	err = service.StartHTTPServer(log, int(port), portsSrv, portsConn)
 	if err != nil {
 		log.Panicln("error starting http client server", err)
 	}

@@ -1,4 +1,4 @@
-FROM golang
+FROM golang:1.16
 
 # Port to run GRPC server
 ENV PORTS_GRPC_PORT=4040
@@ -6,9 +6,7 @@ EXPOSE ${PORTS_GRPC_PORT}
 
 WORKDIR /go/ports
 
-# COPY ./ports.proto ./
 COPY ./ports_service/ ./ports_service
-COPY ./ports/ ./ports
 
 WORKDIR /go/ports/ports_service
 

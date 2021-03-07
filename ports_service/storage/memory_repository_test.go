@@ -1,9 +1,9 @@
 package storage
 
 import (
+	"portsservice/ports"
 	"testing"
 
-	"ports.services.com/ports"
 )
 
 // Test upsert adds Port to repository
@@ -32,7 +32,7 @@ func TestUpsert(t *testing.T) {
 		t.Fatalf("repository initialize failure: %s", err.Error())
 	}
 
-	err = repo.Upsert(ajman)
+	err = repo.Upsert(&ajman)
 	if err != nil {
 		t.Fatalf("upsert error: %s", err.Error())
 	}
@@ -50,7 +50,7 @@ func TestUpsert(t *testing.T) {
 	// Update city, upsert should update port data by the key
 	ajman.City = "Kyiv"
 
-	err = repo.Upsert(ajman)
+	err = repo.Upsert(&ajman)
 	if err != nil {
 		t.Fatalf("upsert error: %s", err.Error())
 	}
@@ -71,7 +71,7 @@ func TestUpsert(t *testing.T) {
 
 	// After changing the key we should have 2 ports in repository
 	ajman.Key = "ABCD"
-	err = repo.Upsert(ajman)
+	err = repo.Upsert(&ajman)
 	if err != nil {
 		t.Fatalf("upsert error: %s", err.Error())
 	}

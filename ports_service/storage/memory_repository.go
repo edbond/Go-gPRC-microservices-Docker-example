@@ -4,13 +4,12 @@ package storage
 
 import (
 	"errors"
-
-	"ports.services.com/ports"
+	"portsservice/ports"
 )
 
 var (
 	// ErrNotFound returned when Port not found in repository
-	ErrNotFound = errors.New("Port not found in repository")
+	ErrNotFound = errors.New("port not found in repository")
 )
 
 // MemoryRepository stores all ports in memory map
@@ -31,18 +30,19 @@ func (repository *MemoryRepository) Close() error {
 }
 
 // Upsert adds or replace Port in repository by Port Key
-func (repository *MemoryRepository) Upsert(port ports.Port) error {
-	repository.ports[port.Key] = port
+func (repository *MemoryRepository) Upsert(port *ports.Port) error {
+	repository.ports[port.Key] = *port
 	return nil
 }
 
 // AllPorts returns all Ports in repository
 func (repository *MemoryRepository) AllPorts() ([]ports.Port, error) {
-	ports := make([]ports.Port, 0, len(repository.ports))
-	for _, port := range repository.ports {
-		ports = append(ports, port)
+	allPorts := make([]ports.Port, 0, len(repository.ports))
+	for k := range repository.ports {
+		p := repository.ports[k]
+		allPorts = append(allPorts, p)
 	}
-	return ports, nil
+	return allPorts, nil
 }
 
 // FindByID lookups Port by Key in repository

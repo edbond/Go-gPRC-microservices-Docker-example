@@ -19,7 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PortsServiceClient interface {
 	// Sends a greeting
-	Upsert(ctx context.Context, in *Port, opts ...grpc.CallOption) (*UpsertResponse, error)
+	Upsert(ctx context.Context, in *PortTransport, opts ...grpc.CallOption) (*UpsertResponse, error)
 	List(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (PortsService_ListClient, error)
 	FindByKey(ctx context.Context, in *FindRequest, opts ...grpc.CallOption) (*FindResponse, error)
 }
@@ -32,7 +32,7 @@ func NewPortsServiceClient(cc grpc.ClientConnInterface) PortsServiceClient {
 	return &portsServiceClient{cc}
 }
 
-func (c *portsServiceClient) Upsert(ctx context.Context, in *Port, opts ...grpc.CallOption) (*UpsertResponse, error) {
+func (c *portsServiceClient) Upsert(ctx context.Context, in *PortTransport, opts ...grpc.CallOption) (*UpsertResponse, error) {
 	out := new(UpsertResponse)
 	err := c.cc.Invoke(ctx, "/PortsService/Upsert", in, out, opts...)
 	if err != nil {
@@ -57,7 +57,7 @@ func (c *portsServiceClient) List(ctx context.Context, in *ListRequest, opts ...
 }
 
 type PortsService_ListClient interface {
-	Recv() (*Port, error)
+	Recv() (*PortTransport, error)
 	grpc.ClientStream
 }
 
@@ -65,8 +65,8 @@ type portsServiceListClient struct {
 	grpc.ClientStream
 }
 
-func (x *portsServiceListClient) Recv() (*Port, error) {
-	m := new(Port)
+func (x *portsServiceListClient) Recv() (*PortTransport, error) {
+	m := new(PortTransport)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (c *portsServiceClient) FindByKey(ctx context.Context, in *FindRequest, opt
 // for forward compatibility
 type PortsServiceServer interface {
 	// Sends a greeting
-	Upsert(context.Context, *Port) (*UpsertResponse, error)
+	Upsert(context.Context, *PortTransport) (*UpsertResponse, error)
 	List(*ListRequest, PortsService_ListServer) error
 	FindByKey(context.Context, *FindRequest) (*FindResponse, error)
 	mustEmbedUnimplementedPortsServiceServer()
@@ -97,7 +97,7 @@ type PortsServiceServer interface {
 type UnimplementedPortsServiceServer struct {
 }
 
-func (UnimplementedPortsServiceServer) Upsert(context.Context, *Port) (*UpsertResponse, error) {
+func (UnimplementedPortsServiceServer) Upsert(context.Context, *PortTransport) (*UpsertResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Upsert not implemented")
 }
 func (UnimplementedPortsServiceServer) List(*ListRequest, PortsService_ListServer) error {
@@ -120,7 +120,7 @@ func RegisterPortsServiceServer(s grpc.ServiceRegistrar, srv PortsServiceServer)
 }
 
 func _PortsService_Upsert_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Port)
+	in := new(PortTransport)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func _PortsService_Upsert_Handler(srv interface{}, ctx context.Context, dec func
 		FullMethod: "/PortsService/Upsert",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PortsServiceServer).Upsert(ctx, req.(*Port))
+		return srv.(PortsServiceServer).Upsert(ctx, req.(*PortTransport))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -146,7 +146,7 @@ func _PortsService_List_Handler(srv interface{}, stream grpc.ServerStream) error
 }
 
 type PortsService_ListServer interface {
-	Send(*Port) error
+	Send(*PortTransport) error
 	grpc.ServerStream
 }
 
@@ -154,7 +154,7 @@ type portsServiceListServer struct {
 	grpc.ServerStream
 }
 
-func (x *portsServiceListServer) Send(m *Port) error {
+func (x *portsServiceListServer) Send(m *PortTransport) error {
 	return x.ServerStream.SendMsg(m)
 }
 
