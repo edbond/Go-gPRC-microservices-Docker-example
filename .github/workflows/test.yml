@@ -19,4 +19,4 @@ jobs:
 
       # Runs test.sh script
       - name: Run test.sh
-        run: ./test.sh
+        run: ./scripts/test.sh
