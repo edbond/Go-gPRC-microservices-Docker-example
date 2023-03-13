@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 )
 
 var (
@@ -15,35 +15,27 @@ var (
 	ErrPortParse = errors.New("error parsing port json")
 )
 
-// Description of a Port structure.
-type Port struct {
-	Key         string    `json:"key,omitempty"`
-	Name        string    `json:"name,omitempty"`
-	City        string    `json:"city,omitempty"`
-	Country     string    `json:"country,omitempty"`
-	Alias       []string  `json:"alias,omitempty"`
-	Regions     []string  `json:"regions,omitempty"`
-	Coordinates []float64 `json:"coordinates,omitempty"`
-	Province    string    `json:"province,omitempty"`
-	Timezone    string    `json:"timezone,omitempty"`
-	Unlocks     []string  `json:"unlocks,omitempty"`
-	Code        string    `json:"code,omitempty"`
-}
-
 // PortCallback is a function that will be called when port parsed
 // from JSON
-type PortCallback func(*Port)
+type PortCallback func(port *Port)
 
 // LoadFromJSON reads JSON file from a reader and parses ports
 // Calls onPort callback function for each port parsed
-func LoadFromJSON(log *logrus.Entry, filename string, onPort PortCallback) error {
+func LoadFromJSON(logger *zerolog.Logger, filename string, onPort PortCallback) error {
+	var err error
+
 	jsonFile, err := os.Open(filename)
 	if err != nil {
 		return fmt.Errorf("error opening ports json file: %w", err)
 	}
 
 	// Close file when function exits
-	defer jsonFile.Close()
+	defer func() {
+		err = jsonFile.Close()
+		if err != nil {
+			logger.Err(err).Msg("error closing json file")
+		}
+	}()
 
 	reader := bufio.NewReader(jsonFile)
 
@@ -78,46 +70,8 @@ func LoadFromJSON(log *logrus.Entry, filename string, onPort PortCallback) error
 	// read closing bracket
 	_, err = dec.Token()
 	if err != nil {
-		log.Errorf("no closing bracker in json: %v", err)
-	}
-
-	err = jsonFile.Close()
-	if err != nil {
-		log.Warnf("error closing json file: %v", err)
+		logger.Err(err).Msg("no closing bracket in json")
 	}
 
 	return nil
-}
-
-func (port *Port) ToTransport() *PortTransport {
-	return &PortTransport{
-		Key:         port.Key,
-		Name:        port.Name,
-		City:        port.City,
-		Country:     port.Country,
-		Alias:       port.Alias,
-		Regions:     port.Regions,
-		Coordinates: port.Coordinates,
-		Province:    port.Province,
-		Timezone:    port.Timezone,
-		Unlocks:     port.Unlocks,
-		Code:        port.Code,
-	}
-}
-
-
-func (portTransport *PortTransport) ToValue() *Port {
-	return &Port{
-		Key:         portTransport.Key,
-		Name:        portTransport.Name,
-		City:        portTransport.City,
-		Country:     portTransport.Country,
-		Alias:       portTransport.Alias,
-		Regions:     portTransport.Regions,
-		Coordinates: portTransport.Coordinates,
-		Province:    portTransport.Province,
-		Timezone:    portTransport.Timezone,
-		Unlocks:     portTransport.Unlocks,
-		Code:        portTransport.Code,
-	}
 }

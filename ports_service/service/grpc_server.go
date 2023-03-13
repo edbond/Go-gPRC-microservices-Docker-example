@@ -6,18 +6,19 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"syscall"
+
 	"portsservice/ports"
 	"portsservice/repository"
 	"portsservice/storage"
-	"syscall"
 
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"google.golang.org/grpc"
 )
 
 type portsService struct {
 	ports.UnimplementedPortsServiceServer
-	repository repository.PortsRepository
+	repository repository.StorageI
 }
 
 func (srv *portsService) List(_ *ports.ListRequest, listResponse ports.PortsService_ListServer) error {
@@ -27,7 +28,7 @@ func (srv *portsService) List(_ *ports.ListRequest, listResponse ports.PortsServ
 	}
 
 	for i := range allPorts {
-		t := allPorts[i].ToTransport()
+		t := allPorts[i]
 		err = listResponse.Send(t)
 		if err != nil {
 			return err
@@ -36,13 +37,13 @@ func (srv *portsService) List(_ *ports.ListRequest, listResponse ports.PortsServ
 	return nil
 }
 
-func (srv *portsService) Upsert(_ context.Context, port *ports.PortTransport) (*ports.UpsertResponse, error) {
-	err := srv.repository.Upsert(port.ToValue())
+func (srv *portsService) Upsert(_ context.Context, port *ports.Port) (*ports.UpsertResponse, error) {
+	err := srv.repository.Upsert(port)
 	return &ports.UpsertResponse{}, err
 }
 
 // StartGRPCServer starts Ports GRPC server
-func StartGRPCServer(log *logrus.Entry) error {
+func StartGRPCServer(logger *zerolog.Logger) error {
 	grpcServer := grpc.NewServer()
 
 	grpcService := portsService{}
@@ -57,15 +58,15 @@ func StartGRPCServer(log *logrus.Entry) error {
 
 	grpcPort := os.Getenv("PORTS_GRPC_PORT")
 	if grpcPort == "" {
-		log.Panic("Please specify tcp port for grpc server in PORTS_GRPC_PORT environment variable")
+		logger.Panic().Msg("Please specify tcp port for grpc server in PORTS_GRPC_PORT environment variable")
 	}
 
 	con, err := net.Listen("tcp", fmt.Sprintf(":%s", grpcPort))
 	if err != nil {
-		log.Panic(err)
+		logger.Panic().Err(err).Msg("listen error")
 	}
 
-	log.Infof("Starting Ports GRPC Server on port %s", grpcPort)
+	logger.Info().Msgf("Starting Ports GRPC Server on port %s", grpcPort)
 
 	// Listen for signals
 	c := make(chan os.Signal, 1)
@@ -75,19 +76,19 @@ func StartGRPCServer(log *logrus.Entry) error {
 		<-c
 
 		// Shutdown GRPC server!
-		log.Infoln("🔻 Shutdown server")
+		logger.Info().Msg("🔻 Shutdown server")
 		err := grpcService.repository.Close()
 		if err != nil {
-			log.Errorf("error closing repository %s", err)
+			logger.Err(err).Msg("error closing repository")
 		}
 		grpcServer.GracefulStop()
-		log.Infoln("Stopped successfully")
+		logger.Info().Msg("Stopped successfully")
 		shutdownComplete <- struct{}{}
 	}()
 
 	err = grpcServer.Serve(con)
 	if err != nil {
-		log.Panic(err)
+		logger.Panic().Err(err).Msg("error running grpc server")
 	}
 	<-shutdownComplete
 

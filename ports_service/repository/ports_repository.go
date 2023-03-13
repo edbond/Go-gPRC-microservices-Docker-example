@@ -4,11 +4,11 @@ import (
 	"portsservice/ports"
 )
 
-// PortsRepository is an interface one should implement
+// StorageI is an interface one should implement
 // to provide ports storage
-type PortsRepository interface {
-	Upsert(*ports.Port) error
-	AllPorts() ([]ports.Port, error)
+type StorageI interface {
+	Upsert(port *ports.Port) error
+	AllPorts() ([]*ports.Port, error)
 	FindByID(string) (*ports.Port, error)
 	Init() error
 	Close() error

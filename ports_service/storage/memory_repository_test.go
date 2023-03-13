@@ -1,9 +1,9 @@
 package storage
 
 import (
-	"portsservice/ports"
 	"testing"
 
+	"portsservice/ports"
 )
 
 // Test upsert adds Port to repository

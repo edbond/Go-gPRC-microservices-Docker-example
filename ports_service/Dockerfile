@@ -1,4 +1,4 @@
-FROM golang:1.16
+FROM golang:1.20
 
 # Port to run GRPC server
 ENV PORTS_GRPC_PORT=4040

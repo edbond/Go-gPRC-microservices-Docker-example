@@ -1,4 +1,4 @@
-FROM golang:1.16
+FROM golang:1.20
 
 # Port to run GRPC server
 ENV HTTP_PORT=8080
@@ -6,9 +6,6 @@ EXPOSE ${HTTP_PORT}
 
 ENV PORTS_ADDRESS=ports_service:4040
 ENV PORTS_JSON=/go/client/ports.json
-
-#RUN go env -w GO111MODULE=auto
-#ENV GO111MODULE=auto
 
 COPY ./client_service/ ./client
 

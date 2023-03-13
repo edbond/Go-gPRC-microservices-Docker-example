@@ -1,24 +1,25 @@
 package service
 
 import (
+	"os"
 	"strings"
 	"testing"
 
 	"clientservice/ports"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 )
 
 func TestLoadJSON(t *testing.T) {
 	testCases := []struct {
 		filename      string
-		expected      []ports.Port
+		expected      []*ports.Port
 		expectedError error
 	}{
 		{
 			filename: "valid_ports.json",
-			expected: []ports.Port{
+			expected: []*ports.Port{
 				{
 					Key:         "AEAJM",
 					Name:        "Ajman",
@@ -36,28 +37,26 @@ func TestLoadJSON(t *testing.T) {
 		},
 		{
 			filename:      "invalid.json",
-			expected:      []ports.Port{},
+			expected:      []*ports.Port{},
 			expectedError: ports.ErrPortParse,
 		},
 	}
 
 	portsComparer := cmp.Comparer(func(p1, p2 *ports.Port) bool {
-		return (*p1).Key == (*p2).Key
+		return p1.Key == p2.Key
 	})
 
 	for _, tC := range testCases {
 		t.Run(tC.filename, func(t *testing.T) {
 			var err error
 
-			log := logrus.New().WithFields(logrus.Fields{
-				"Test": tC.filename,
-			})
+			logger := zerolog.New(os.Stderr)
 
-			portsSlice := []ports.Port{}
+			portsSlice := []*ports.Port{}
 			callback := func(port *ports.Port) {
-				portsSlice = append(portsSlice, *port)
+				portsSlice = append(portsSlice, port)
 			}
-			err = ports.LoadFromJSON(log, tC.filename, callback)
+			err = ports.LoadFromJSON(&logger, tC.filename, callback)
 			if err != nil {
 				if tC.expectedError != nil && strings.Contains(err.Error(), tC.expectedError.Error()) {
 					// OK, we expect this error
@@ -66,10 +65,12 @@ func TestLoadJSON(t *testing.T) {
 				}
 			}
 
-			if !cmp.Equal(portsSlice, tC.expected, portsComparer) {
-				t.Fatalf(`Ports parsed and expected are different:  
-				%v`, cmp.Diff(portsSlice, tC.expected))
+			if cmp.Equal(portsSlice, tC.expected, portsComparer) {
+				return
 			}
+
+			t.Fatalf(`Ports parsed and expected are different:  
+				%v`, cmp.Diff(portsSlice, tC.expected))
 		})
 	}
 }

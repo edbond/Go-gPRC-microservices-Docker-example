@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -eou pipefail
+
 export PORTS_ADDRESS=localhost:4040 
 export PORTS_JSON=./ports/ports.json
 export HTTP_PORT=8080 

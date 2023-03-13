@@ -20,7 +20,7 @@ func NewPortsService() (ports.PortsServiceClient, *grpc.ClientConn, error) {
 
 	portsConn, err := grpc.Dial(portsServiceAddress, grpc.WithInsecure())
 	if err != nil {
-		return nil, nil, fmt.Errorf("Can't connect to Ports service using address %s: %s", portsServiceAddress, err)
+		return nil, nil, fmt.Errorf("can't connect to Ports service using address %s: %s", portsServiceAddress, err)
 	}
 
 	portsSrv := ports.NewPortsServiceClient(portsConn)

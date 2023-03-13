@@ -3,16 +3,13 @@ package main
 import (
 	"portsservice/service"
 
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 )
 
 func main() {
-	logger := logrus.New()
-	log := logger.WithFields(logrus.Fields{
-		"Server": "Ports GRPC Server",
-	})
+	logger := zerolog.New(zerolog.NewConsoleWriter())
 
-	if err := service.StartGRPCServer(log); err != nil {
-		log.Panic(err)
+	if err := service.StartGRPCServer(&logger); err != nil {
+		logger.Panic().Err(err).Msg("error running grpc server")
 	}
 }

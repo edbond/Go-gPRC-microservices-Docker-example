@@ -1,38 +1,37 @@
 package main
 
 import (
-	"clientservice/service"
 	"os"
 	"strconv"
 
-	"github.com/sirupsen/logrus"
+	"clientservice/service"
+
+	"github.com/rs/zerolog"
 )
 
 func main() {
-	logger := logrus.New()
-	log := logger.WithFields(logrus.Fields{
-		"Server": "Client",
-	})
+	logger := zerolog.New(zerolog.NewConsoleWriter()).With().
+		Str("server", "client").Logger()
 
 	// Get HTTP port from environment variable
 	portString := os.Getenv("HTTP_PORT")
 	if portString == "" {
-		log.Panicln("Please specify HTTP port in HTTP_PORT environment variable")
+		logger.Fatal().Msg("Please specify HTTP port in HTTP_PORT environment variable")
 	}
 
 	port, err := strconv.ParseInt(portString, 10, 64)
 	if err != nil {
-		log.Panicf("error parsing HTTP_PORT: %s", err)
+		logger.Fatal().Err(err).Msg("error parsing HTTP_PORT")
 	}
 
 	// Connect to Ports gRPC server
 	portsSrv, portsConn, err := service.NewPortsService()
 	if err != nil {
-		log.Panicln("error connecting to Ports gRPC server", err)
+		logger.Fatal().Err(err).Msg("error connecting to Ports gRPC server")
 	}
 
-	err = service.StartHTTPServer(log, int(port), portsSrv, portsConn)
+	err = service.StartHTTPServer(&logger, int(port), portsSrv, portsConn)
 	if err != nil {
-		log.Panicln("error starting http client server", err)
+		logger.Fatal().Err(err).Msg("error starting http client server")
 	}
 }

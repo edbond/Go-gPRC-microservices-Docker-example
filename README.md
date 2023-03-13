@@ -22,6 +22,12 @@ Client service exposes the HTTP interface to add and list ports.
 
 ![Tests](https://github.com/edbond/Go-gPRC-microservices-Docker-example/workflows/tests/badge.svg)
 
+## Prerequisites
+
+```shell
+brew install protoc-gen-go
+```
+
 ## Ports service
 
 Ports service is used to store ports.

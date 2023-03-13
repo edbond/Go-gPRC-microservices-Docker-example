@@ -1,2 +1,6 @@
 TASK.md
 .idea
+/bazel-bin/
+/bazel-Go-gPRC-microservices-Docker-example/
+/bazel-out/
+/bazel-testlogs/
