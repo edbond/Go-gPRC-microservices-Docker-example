@@ -41,7 +41,7 @@ jobs:
           # only-new-issues: true
 
           # Optional: if set to true then the action will use pre-installed Go
-          # skip-go-installation: true
+          skip-go-installation: true
       - name: golangci-lint ports_service
         uses: golangci/golangci-lint-action@v3
         with:
@@ -58,4 +58,4 @@ jobs:
           # only-new-issues: true
 
           # Optional: if set to true then the action will use pre-installed Go
-          # skip-go-installation: true
+          skip-go-installation: true
